@@ -1,9 +1,10 @@
-package repository
+package integration
 
 import (
 	"context"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
+	"mazekav/internal/repository"
 	"mazekav/pkg/testutil"
 	"testing"
 )
@@ -18,13 +19,13 @@ func (m MyTable) Table() string {
 }
 
 func TestCommonBehaviour_Save(t *testing.T) {
+	t.Parallel()
 
-	db, cancel := testutil.CreateTestDB(t)
-	defer cancel()
+	db := testutil.GetConnection(t)
 
 	assert.NoError(t, db.AutoMigrate(&MyTable{}))
 
-	cb := NewCommonBehaviour[MyTable](db)
+	cb := repository.NewCommonBehaviour[MyTable](db)
 
 	myRow := &MyTable{Name: "ali"}
 	assert.NoError(t, cb.Save(context.Background(), myRow))
@@ -36,15 +37,15 @@ func TestCommonBehaviour_Save(t *testing.T) {
 }
 
 func TestCommonBehaviour_ByID(t *testing.T) {
-	db, cancel := testutil.CreateTestDB(t)
-	defer cancel()
+	t.Parallel()
+	db := testutil.GetConnection(t)
 
 	assert.NoError(t, db.AutoMigrate(&MyTable{}))
 
 	db.Create(&MyTable{Name: "ali"})
 	db.Create(&MyTable{Name: "reza"})
 
-	cb := NewCommonBehaviour[MyTable](db)
+	cb := repository.NewCommonBehaviour[MyTable](db)
 
 	model, err := cb.ByID(context.Background(), 2)
 	assert.NoError(t, err)
