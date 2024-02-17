@@ -95,6 +95,10 @@ func TeardownMySQLServer() error {
 // GetConnection creates a new database within the MySQL container and returns a connection to it.
 // This allows each test to operate in isolation.
 func GetConnection(t *testing.T) *gorm.DB {
+	if !mysqlTestContainer.running {
+		t.Fatal("mysql container is not running ,did you forget to call StartMySQL?")
+	}
+
 	dbName := generateDBName()
 	if err := mysqlTestContainer.mainConnection.Exec("CREATE DATABASE " + dbName).Error; err != nil {
 		logrus.WithError(err).WithField("dbname", dbName).Errorln("couldn't create the test database")
