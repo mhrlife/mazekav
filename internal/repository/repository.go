@@ -15,3 +15,8 @@ type CommonBehaviourRepository[T entity.DBModel] interface {
 type UserRepository interface {
 	CommonBehaviourRepository[entity.User]
 }
+
+type RestaurantRepository interface {
+	CommonBehaviourRepository[entity.Restaurant]
+	Nearby(ctx context.Context, lat, long, radius float64) ([]entity.Restaurant, error)
+}

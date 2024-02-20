@@ -12,6 +12,10 @@ func TestMigrations(t *testing.T) {
 	db := testutil.GetConnection(t)
 	err := db.AutoMigrate(
 		&entity.User{},
+		&entity.Restaurant{},
 	)
 	assert.NoError(t, err)
+	// check indexes
+	indexInfo, err := testutil.GetIndexInfo(t, db, "restaurants", "idx_location")
+	assert.Equal(t, "SPATIAL", indexInfo.IndexType)
 }
